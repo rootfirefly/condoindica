@@ -100,7 +100,7 @@ export default function Header() {
           {user && isAuthorized && (
             <nav className="hidden md:flex justify-center w-1/2">
               <div className="flex justify-center">
-                <MainMenu currentPage={router.pathname.slice(1) as 'feed' | 'servicos' | 'indicar' | 'perfil'} />
+                <MainMenu currentPage={(router.pathname.slice(1) || 'dashboard') as 'feed' | 'servicos' | 'indicar' | 'perfil'} />
               </div>
             </nav>
           )}
@@ -129,7 +129,7 @@ export default function Header() {
                     )}
                   </div>
                   <span className="hidden md:inline text-sm cursor-pointer" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
-                    Olá, {user?.displayName?.split(' ')[0] || user?.email?.split('@')[0] || 'Usuário'}
+                    Olá, {user?.displayName || user?.email?.split('@')[0] || 'Usuário'}
                   </span>
                   {isDropdownOpen && (
                     <div className="absolute right-0 mt-[250px] w-48 bg-white rounded-md shadow-lg py-1 z-10">
@@ -183,9 +183,9 @@ export default function Header() {
           </div>
         </div>
       </div>
-      {user && (
+      {user && isAuthorized && (
         <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-          <MainMenu currentPage={router.pathname.slice(1) as 'feed' | 'servicos' | 'indicar' | 'perfil'} isMobile={true} />
+          <MainMenu currentPage={(router.pathname.slice(1) || 'dashboard') as 'feed' | 'servicos' | 'indicar' | 'perfil'} isMobile={true} />
         </div>
       )}
     </header>

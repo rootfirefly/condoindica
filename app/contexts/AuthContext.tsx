@@ -12,7 +12,12 @@ type AuthContextType = {
   profileCompleted: boolean;
 };
 
-const AuthContext = createContext<AuthContextType>({ user: null, loading: true, isAuthorized: false, profileCompleted: false });
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  loading: true,
+  isAuthorized: false,
+  profileCompleted: false
+});
 
 export const useAuth = () => useContext(AuthContext);
 
@@ -24,18 +29,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log('AuthContext: Auth state changed', { userId: user?.uid });
+      console.log('AuthContext: Auth state changed', user ? 'User logged in' : 'No user');
       setUser(user);
       if (user) {
         const userDocRef = doc(db, 'users', user.uid);
         const userDoc = await getDoc(userDocRef);
         const userData = userDoc.data();
         setIsAuthorized(userDoc.exists());
-        const isProfileCompleted = userData?.profileCompleted || false;
-        setProfileCompleted(isProfileCompleted);
+        setProfileCompleted(userData?.profileCompleted || false);
         console.log('AuthContext: User data fetched', { 
           isAuthorized: userDoc.exists(),
-          profileCompleted: isProfileCompleted 
+          profileCompleted: userData?.profileCompleted || false
         });
       } else {
         setIsAuthorized(false);
@@ -48,15 +52,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, []);
 
-  const value = {
-    user,
-    loading,
-    isAuthorized,
-    profileCompleted
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, loading, isAuthorized, profileCompleted }}>
       {children}
     </AuthContext.Provider>
   );

@@ -250,8 +250,11 @@ export default function Dashboard() {
     );
   };
 
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
+
   if (!user || !profileCompleted) {
-    console.log('Dashboard: User not authorized, rendering null');
     return null;
   }
 
