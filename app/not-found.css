@@ -1,0 +1,13 @@
+@keyframes windowBlink {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.window {
+  animation: windowBlink 2s infinite;
+}
+
+.window:nth-child(odd) {
+  animation-delay: 0.5s;
+}
+
