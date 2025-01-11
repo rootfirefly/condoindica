@@ -129,7 +129,7 @@ export default function Header() {
                     )}
                   </div>
                   <span className="hidden md:inline text-sm cursor-pointer" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
-                    Olá, {user?.displayName ? user.displayName.split(' ')[0] : user?.email?.split('@')[0] ?? 'Usuário'}
+                    Olá, {user?.displayName?.split(' ')[0] || user?.email?.split('@')[0] || 'Usuário'}
                   </span>
                   {isDropdownOpen && (
                     <div className="absolute right-0 mt-[250px] w-48 bg-white rounded-md shadow-lg py-1 z-10">

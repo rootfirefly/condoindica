@@ -24,7 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log('AuthContext: Auth state changed', { user: user ? { ...user, displayName: user.displayName } : null });
+      console.log('AuthContext: Auth state changed', { userId: user?.uid });
       setUser(user);
       if (user) {
         const userDocRef = doc(db, 'users', user.uid);
