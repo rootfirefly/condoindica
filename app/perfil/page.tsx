@@ -43,7 +43,9 @@ export default function Perfil() {
     status: 'pendente',
     photoURL: '',
     role: 'morador',
-    profileCompleted: false
+    profileCompleted: false,
+    createdAt: null,
+    updatedAt: null
   })
 
   const [isLoading, setIsLoading] = useState(false)
@@ -69,6 +71,12 @@ export default function Perfil() {
         const userData = docSnap.data()
         setFormData(prev => ({ ...prev, ...userData }))
         setPhotoPreview(userData.photoURL || null)
+        if (userData.createdAt) {
+          setFormData(prev => ({ ...prev, createdAt: userData.createdAt.toDate() }))
+        }
+        if (userData.updatedAt) {
+          setFormData(prev => ({ ...prev, updatedAt: userData.updatedAt.toDate() }))
+        }
       } else {
         console.log('Nenhum documento de usuário encontrado')
       }
@@ -165,6 +173,26 @@ export default function Perfil() {
     }
   }
 
+  const sendWebhook = async (profileData: any) => {
+    try {
+      const response = await fetch('https://webhook.nexuinsolution.com.br/webhook/aa8c569a-695c-425e-acf6-7dcc0513beb4', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send webhook');
+      }
+
+      console.log('Webhook sent successfully');
+    } catch (error) {
+      console.error('Error sending webhook:', error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (isLoading) return
@@ -175,23 +203,36 @@ export default function Perfil() {
     try {
       if (user) {
         const userDocRef = doc(db, 'users', user.uid)
-        await setDoc(userDocRef, { 
-          ...formData, 
-          role: 'morador',
-          profileCompleted: true  // Garantindo que este campo seja definido como true
-        }, { merge: true })
+        const now = new Date()
+        const updatedFormData = {
+          ...formData,
+          updatedAt: now
+        }
+        if (!formData.createdAt) {
+          updatedFormData.createdAt = now
+        }
 
-        await updateProfile(user, { 
-          displayName: formData.nomeCompleto, 
-          photoURL: formData.photoURL 
-        })
+        // Atualizar o estado local
+        setFormData(updatedFormData)
 
-        console.log('Perfil atualizado com sucesso, profileCompleted definido como true')
+        // Salvar os dados do perfil no Firestore
+        await setDoc(userDocRef, updatedFormData, { merge: true })
+
+        // Enviar o webhook com todas as informações do perfil, incluindo as datas
+        await sendWebhook({
+          ...updatedFormData,
+          userId: user.uid,
+          email: user.email,
+          createdAt: updatedFormData.createdAt ? updatedFormData.createdAt.toISOString() : null,
+          updatedAt: updatedFormData.updatedAt.toISOString()
+        });
+
+        console.log('Perfil atualizado com sucesso e webhook enviado')
         alert('Perfil atualizado com sucesso!')
         router.push('/dashboard')
       }
     } catch (error) {
-      console.error('Erro ao salvar o perfil:', error)
+      console.error('Erro ao salvar o perfil ou enviar webhook:', error)
       setError('Erro ao salvar o perfil. Por favor, tente novamente.')
     } finally {
       setIsLoading(false)
