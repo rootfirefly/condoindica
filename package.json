@@ -63,9 +63,9 @@
     "@mui/material": "latest",
     "react-hot-toast": "latest",
     "uuid": "latest",
-    "react-qr-reader": "latest",
     "framer-motion": "latest",
-    "qrcode.react": "latest"
+    "qrcode.react": "latest",
+    "qr-scanner": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",
