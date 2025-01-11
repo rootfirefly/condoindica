@@ -21,11 +21,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [profileCompleted, setProfileCompleted] = useState(false);
-  const profileCompletedRef = React.useRef(profileCompleted);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log('AuthContext: Auth state changed', { user });
+      console.log('AuthContext: Auth state changed', { user: user ? { ...user, displayName: user.displayName } : null });
       setUser(user);
       if (user) {
         const userDocRef = doc(db, 'users', user.uid);
@@ -33,7 +32,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const userData = userDoc.data();
         setIsAuthorized(userDoc.exists());
         const isProfileCompleted = userData?.profileCompleted || false;
-        profileCompletedRef.current = isProfileCompleted;
         setProfileCompleted(isProfileCompleted);
         console.log('AuthContext: User data fetched', { 
           isAuthorized: userDoc.exists(),
@@ -50,8 +48,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, []);
 
+  const value = {
+    user,
+    loading,
+    isAuthorized,
+    profileCompleted
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, isAuthorized, profileCompleted: profileCompletedRef.current }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
