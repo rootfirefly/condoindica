@@ -100,7 +100,7 @@ export default function Header() {
           {user && isAuthorized && (
             <nav className="hidden md:flex justify-center w-1/2">
               <div className="flex justify-center">
-                <MainMenu currentPage={(router.pathname.slice(1) || 'dashboard') as 'feed' | 'servicos' | 'indicar' | 'perfil'} />
+                <MainMenu currentPage={(typeof window !== 'undefined' ? window.location.pathname.slice(1) : 'dashboard') as 'feed' | 'servicos' | 'indicar' | 'perfil'} />
               </div>
             </nav>
           )}
@@ -185,7 +185,7 @@ export default function Header() {
       </div>
       {user && isAuthorized && (
         <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-          <MainMenu currentPage={(router.pathname.slice(1) || 'dashboard') as 'feed' | 'servicos' | 'indicar' | 'perfil'} isMobile={true} />
+          <MainMenu currentPage={(typeof window !== 'undefined' ? window.location.pathname.slice(1) : 'dashboard') as 'feed' | 'servicos' | 'indicar' | 'perfil'} isMobile={true} />
         </div>
       )}
     </header>

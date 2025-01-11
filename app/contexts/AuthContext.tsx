@@ -35,11 +35,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const userDocRef = doc(db, 'users', user.uid);
         const userDoc = await getDoc(userDocRef);
         const userData = userDoc.data();
-        setIsAuthorized(userDoc.exists());
-        setProfileCompleted(userData?.profileCompleted || false);
+        const isUserAuthorized = userDoc.exists();
+        const isProfileCompleted = userData?.profileCompleted || false;
+        setIsAuthorized(isUserAuthorized);
+        setProfileCompleted(isProfileCompleted);
         console.log('AuthContext: User data fetched', { 
-          isAuthorized: userDoc.exists(),
-          profileCompleted: userData?.profileCompleted || false
+          isAuthorized: isUserAuthorized,
+          profileCompleted: isProfileCompleted 
         });
       } else {
         setIsAuthorized(false);
